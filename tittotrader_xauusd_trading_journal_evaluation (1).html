@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tittotrader | XAUUSD Journal & Evaluation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0A0A0C',
+                        darkcard: '#121216',
+                        darkborder: '#262630',
+                        pinkmain: '#FF1493', // Hot Pink
+                        pinklight: '#FF69B4', // Light Neon Pink
+                        pinkglow: 'rgba(255, 20, 147, 0.25)',
+                        pinkdark: '#B3005E',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0A0A0C;
+            color: #E2E8F0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0C;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262630;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF1493;
+        }
+
+        /* Neon Pink Glow Utilities */
+        .pink-glow {
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.35);
+        }
+        .pink-glow-lg {
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.5);
+        }
+        .text-pink-glow {
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.6);
+        }
+        .border-pink-glow {
+            border-color: rgba(255, 20, 147, 0.6);
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.2);
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(18, 18, 22, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 20, 147, 0.15);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 20, 147, 0.35);
+        }
+
+        /* Modal transitions */
+        .modal {
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-10">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-[#0A0A0C]/90 backdrop-blur-md border-b border-darkborder/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <!-- SVG Recreation of Uploaded Logo in Pink/Black Aesthetic -->
+                <div class="w-12 h-12 bg-darkcard rounded-xl p-2 border border-pinkmain/40 flex items-center justify-center pink-glow">
+                    <svg viewBox="0 0 500 500" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="pinkGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#FF1493" />
+                                <stop offset="100%" stop-color="#FF69B4" />
+                            </linearGradient>
+                        </defs>
+                        <!-- First Zig-zag Arrow (Dark/Gray Accent) -->
+                        <path d="M 40 250 L 150 140 L 250 250 L 400 90 L 400 150 M 400 90 L 340 90" 
+                              stroke="#64748B" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        <!-- Second Intersecting Zig-zag Arrow (Neon Pink Gradient) -->
+                        <path d="M 140 250 L 250 140 L 320 210 L 450 140 L 450 200 M 450 140 L 390 140" 
+                              stroke="url(#pinkGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wider text-white flex items-center gap-1">
+                        titto<span class="text-pinkmain text-pink-glow">trader</span>
+                    </h1>
+                    <p class="text-[10px] tracking-widest uppercase text-gray-400 font-semibold">XAUUSD Trading Journal</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-3">
+                <button onclick="openModal()" class="px-4 py-2.5 rounded-xl bg-pinkmain hover:bg-pinklight text-white font-bold text-sm transition-all duration-300 flex items-center gap-2 pink-glow hover:scale-105">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Catat Trade Baru</span>
+                </button>
+                
+                <div class="relative group">
+                    <button class="w-10 h-10 rounded-xl bg-darkcard border border-darkborder flex items-center justify-center text-gray-300 hover:border-pinkmain transition-all">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-darkcard border border-darkborder rounded-xl shadow-2xl py-2 hidden group-hover:block z-50">
+                        <button onclick="exportJSON()" class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-pinkmain/20 hover:text-pinklight flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Ekspor JSON
+                        </button>
+                        <button onclick="exportCSV()" class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-pinkmain/20 hover:text-pinklight flex items-center gap-2">
+                            <i class="fa-solid fa-file-csv"></i> Ekspor CSV
+                        </button>
+                        <label class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-pinkmain/20 hover:text-pinklight flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-upload"></i> Impor JSON
+                            <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importJSON(event)">
+                        </label>
+                        <hr class="border-darkborder my-1">
+                        <button onclick="resetData()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> Reset Semua Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6 flex-1 w-full">
+
+        <!-- DASHBOARD SUMMARY CARDS -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            
+            <!-- Total Net P&L -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Net Profit</span>
+                    <i class="fa-solid fa-wallet text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statNetPnL" class="text-xl sm:text-2xl font-black text-white">$0.00</p>
+                    <p id="statNetPips" class="text-xs font-medium text-pinklight mt-0.5">+0.0 Pips</p>
+                </div>
+            </div>
+
+            <!-- Win Rate -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Win Rate</span>
+                    <i class="fa-solid fa-chart-pie text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statWinRate" class="text-xl sm:text-2xl font-black text-white">0%</p>
+                    <p id="statWinRatio" class="text-xs font-medium text-gray-400 mt-0.5">0W / 0L</p>
+                </div>
+            </div>
+
+            <!-- Total Trades -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Total Trades</span>
+                    <i class="fa-solid fa-list-check text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statTotalTrades" class="text-xl sm:text-2xl font-black text-white">0</p>
+                    <p class="text-xs font-medium text-gray-400 mt-0.5">XAUUSD Executed</p>
+                </div>
+            </div>
+
+            <!-- Profit Factor -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Profit Factor</span>
+                    <i class="fa-solid fa-scale-balanced text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statProfitFactor" class="text-xl sm:text-2xl font-black text-white">0.00</p>
+                    <p class="text-xs font-medium text-gray-400 mt-0.5">Gross W / Gross L</p>
+                </div>
+            </div>
+
+            <!-- Avg Win / Loss -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Avg Win / Loss</span>
+                    <i class="fa-solid fa-right-left text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statAvgWinLoss" class="text-lg sm:text-xl font-bold text-white">$0 / $0</p>
+                    <p id="statRRRatio" class="text-xs font-medium text-pinklight mt-0.5">RR Avg 1:0.0</p>
+                </div>
+            </div>
+
+            <!-- Discipline Score -->
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+                    <span>Disiplin Rules</span>
+                    <i class="fa-solid fa-shield-halved text-pinkmain"></i>
+                </div>
+                <div class="mt-2">
+                    <p id="statDiscipline" class="text-xl sm:text-2xl font-black text-pinklight">100%</p>
+                    <p class="text-xs font-medium text-gray-400 mt-0.5">Sesuai Trading Plan</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ANALYTICS & CHARTS SECTION -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Main Equity Curve Chart (2 Cols) -->
+            <div class="glass-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-pinkmain"></i> XAUUSD Equity Curve
+                        </h3>
+                        <p class="text-xs text-gray-400">Pertumbuhan Saldo & Kumulatif P&L</p>
+                    </div>
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-pinkmain/10 border border-pinkmain/30 text-pinklight">
+                        Live Tracking
+                    </span>
+                </div>
+                <div class="w-full h-64 sm:h-72">
+                    <canvas id="equityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Analytics Breakdown (1 Col) -->
+            <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-brain text-pinkmain"></i> Performance Breakdown
+                    </h3>
+                    <select id="chartBreakdownSelect" onchange="updateBreakdownChart()" class="bg-darkbg text-xs border border-darkborder rounded-lg px-2 py-1 text-gray-300 focus:border-pinkmain outline-none">
+                        <option value="session">By Session</option>
+                        <option value="setup">By Strategy / Setup</option>
+                        <option value="psychology">By Psikologi / Emosi</option>
+                    </select>
+                </div>
+                <div class="w-full h-56 flex items-center justify-center">
+                    <canvas id="breakdownChart"></canvas>
+                </div>
+                <div class="text-center text-xs text-gray-400 italic">
+                    Gunakan chart ini untuk evaluasi jam trading & tingkat kepatuhan emosi.
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TRADE JOURNAL TABLE SECTION -->
+        <section class="glass-card rounded-2xl p-5 space-y-4">
+            
+            <!-- Table Header & Controls -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-darkborder/60 pb-4">
+                <div>
+                    <h3 class="font-bold text-white text-xl flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-pinkmain"></i> Riwayat Jurnal Trade
+                    </h3>
+                    <p class="text-xs text-gray-400">Evaluasi menyeluruh setiap posisi XAUUSD yang dieksekusi</p>
+                </div>
+
+                <!-- Filters & Search -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-500 text-xs"></i>
+                        <input type="text" id="searchInput" oninput="renderTradesTable()" placeholder="Cari setup/catatan..." class="bg-darkbg text-xs border border-darkborder rounded-xl pl-8 pr-3 py-2 text-gray-200 focus:border-pinkmain outline-none w-36 sm:w-48">
+                    </div>
+
+                    <!-- Filter Session -->
+                    <select id="filterSession" onchange="renderTradesTable()" class="bg-darkbg text-xs border border-darkborder rounded-xl px-3 py-2 text-gray-200 focus:border-pinkmain outline-none">
+                        <option value="ALL">Semua Sesi</option>
+                        <option value="Asian">Asian Session</option>
+                        <option value="London">London Session</option>
+                        <option value="New York">New York Session</option>
+                        <option value="NY/LDN Overlap">NY/LDN Overlap</option>
+                    </select>
+
+                    <!-- Filter Direction -->
+                    <select id="filterDirection" onchange="renderTradesTable()" class="bg-darkbg text-xs border border-darkborder rounded-xl px-3 py-2 text-gray-200 focus:border-pinkmain outline-none">
+                        <option value="ALL">Semua Arah</option>
+                        <option value="BUY">BUY Only</option>
+                        <option value="SELL">SELL Only</option>
+                    </select>
+
+                    <!-- Filter Outcome -->
+                    <select id="filterOutcome" onchange="renderTradesTable()" class="bg-darkbg text-xs border border-darkborder rounded-xl px-3 py-2 text-gray-200 focus:border-pinkmain outline-none">
+                        <option value="ALL">Semua Hasil</option>
+                        <option value="WIN">Profit (WIN)</option>
+                        <option value="LOSS">Rugi (LOSS)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table Body -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-darkborder uppercase tracking-wider bg-darkcard/50">
+                            <th class="p-3">Tanggal & Sesi</th>
+                            <th class="p-3">Tipe</th>
+                            <th class="p-3">Lot</th>
+                            <th class="p-3">Harga Entry / Exit</th>
+                            <th class="p-3">Pips</th>
+                            <th class="p-3">P&L ($)</th>
+                            <th class="p-3">Setup / Strategi</th>
+                            <th class="p-3">Psikologi</th>
+                            <th class="p-3">Plan?</th>
+                            <th class="p-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradesTableBody" class="divide-y divide-darkborder/50 text-gray-300 font-medium">
+                        <!-- Trades rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State Placeholder -->
+            <div id="emptyState" class="hidden text-center py-12 space-y-3">
+                <i class="fa-solid fa-folder-open text-4xl text-gray-600"></i>
+                <p class="text-gray-400 text-sm">Belum ada jurnal trading tercatat.</p>
+                <button onclick="openModal()" class="px-4 py-2 bg-pinkmain/20 text-pinklight border border-pinkmain/40 rounded-xl text-xs font-semibold hover:bg-pinkmain hover:text-white transition-all">
+                    Tambah Trade Pertama
+                </button>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 text-center text-xs text-gray-500">
+        <p>&copy; 2026 <span class="text-pinklight font-bold">tittotrader</span> - XAUUSD Trading Analytics Platform. High Voltage Discipline.</p>
+    </footer>
+
+    <!-- ADD / EDIT TRADE MODAL -->
+    <div id="tradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none modal">
+        <div class="bg-darkcard border border-pinkmain/40 w-full max-w-2xl rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl pink-glow-lg max-h-[90vh] overflow-y-auto">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-darkborder pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-pinkmain/20 border border-pinkmain flex items-center justify-center text-pinklight">
+                        <i class="fa-solid fa-pen-to-square text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="text-xl font-bold text-white">Input Trade XAUUSD Baru</h3>
+                        <p class="text-xs text-gray-400">Isi parameter jurnal eksekusi posisi Anda secara objektif</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="tradeForm" onsubmit="saveTrade(event)" class="space-y-4">
+                <input type="hidden" id="tradeId">
+
+                <!-- Row 1: Date & Session -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Tanggal & Waktu</label>
+                        <input type="datetime-local" id="tradeDate" required class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Sesi Trading</label>
+                        <select id="tradeSession" required class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                            <option value="Asian">Asian Session (00:00 - 08:00 GMT)</option>
+                            <option value="London">London Session (08:00 - 13:00 GMT)</option>
+                            <option value="New York" selected>New York Session (13:00 - 21:00 GMT)</option>
+                            <option value="NY/LDN Overlap">NY/LDN Overlap (13:00 - 16:00 GMT)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Position Type & Lot Size -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Posisi (Direction)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="direction" value="BUY" checked onchange="calculateLiveMetrics()" class="peer hidden">
+                                <div class="py-2.5 text-center text-xs font-bold rounded-xl border border-darkborder text-gray-400 peer-checked:border-pinkmain peer-checked:bg-pinkmain peer-checked:text-white transition-all">
+                                    <i class="fa-solid fa-arrow-trend-up"></i> BUY
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="direction" value="SELL" onchange="calculateLiveMetrics()" class="peer hidden">
+                                <div class="py-2.5 text-center text-xs font-bold rounded-xl border border-darkborder text-gray-400 peer-checked:border-pinkmain peer-checked:bg-pinkmain peer-checked:text-white transition-all">
+                                    <i class="fa-solid fa-arrow-trend-down"></i> SELL
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Ukuran Lot (Lot Size)</label>
+                        <input type="number" step="0.01" min="0.01" id="tradeLot" value="1.00" required oninput="calculateLiveMetrics()" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                </div>
+
+                <!-- Row 3: Prices (Entry, Exit, SL, TP) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Harga Entry</label>
+                        <input type="number" step="0.01" id="tradeEntry" placeholder="2650.00" required oninput="calculateLiveMetrics()" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Harga Exit</label>
+                        <input type="number" step="0.01" id="tradeExit" placeholder="2660.00" required oninput="calculateLiveMetrics()" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Stop Loss (SL)</label>
+                        <input type="number" step="0.01" id="tradeSL" placeholder="2645.00" oninput="calculateLiveMetrics()" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Take Profit (TP)</label>
+                        <input type="number" step="0.01" id="tradeTP" placeholder="2670.00" oninput="calculateLiveMetrics()" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                    </div>
+                </div>
+
+                <!-- Live Calculated Preview Box -->
+                <div class="p-3 bg-darkbg/80 border border-pinkmain/30 rounded-xl flex flex-wrap items-center justify-between text-xs gap-2">
+                    <div>
+                        <span class="text-gray-400">Estimasi Pips: </span>
+                        <span id="previewPips" class="font-bold text-white">0.0 pips</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Estimasi P&L: </span>
+                        <span id="previewPnL" class="font-bold text-pinklight">$0.00</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Risk : Reward: </span>
+                        <span id="previewRR" class="font-bold text-white">1 : 0.0</span>
+                    </div>
+                </div>
+
+                <!-- Row 4: Strategy & Psychology -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Setup / Strategi</label>
+                        <select id="tradeSetup" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                            <option value="Liquidity Sweep">Liquidity Sweep (SMC)</option>
+                            <option value="Order Block / FVG">Order Block / FVG Retest</option>
+                            <option value="Breakout & Retest">Breakout & Retest</option>
+                            <option value="Trend Continuation">Trend Continuation</option>
+                            <option value="News Trading / Volatility">News Trading / Volatility</option>
+                            <option value="Scalping 1m/5m">Scalping 1m/5m</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Kondisi Psikologi / Emosi</label>
+                        <select id="tradePsychology" class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-xs text-white focus:border-pinkmain outline-none">
+                            <option value="Disiplin & Tenang">Disiplin & Tenang</option>
+                            <option value="FOMO / Terburu-buru">FOMO / Terburu-buru</option>
+                            <option value="Revenge Trade">Revenge Trade (Balas Dendam)</option>
+                            <option value="Early Exit (Kekeringan)">Early Exit (Gatal Cut Profit)</option>
+                            <option value="Overleveraged (Overlot)">Overleveraged (Lot Kebesaran)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 5: Rules Followed & Notes -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="tradeRules" checked class="w-4 h-4 rounded border-darkborder text-pinkmain focus:ring-pinkmain bg-darkbg accent-pinkmain">
+                        <label for="tradeRules" class="text-xs text-gray-300 font-medium cursor-pointer">
+                            Eksekusi ini 100% Sesuai dengan Trading Plan Saya
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Catatan Evaluasi / Alasan Entry</label>
+                        <textarea id="tradeNotes" rows="2" placeholder="Tuliskan konfirmasi entry, kendala psikologis, atau pembelajaran..." class="w-full bg-darkbg border border-darkborder rounded-xl p-3 text-xs text-white focus:border-pinkmain outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex justify-end gap-3 border-t border-darkborder pt-4">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-darkborder text-gray-400 hover:text-white text-xs font-semibold">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-pinkmain hover:bg-pinklight text-white text-xs font-bold pink-glow transition-all">
+                        Simpan Jurnal Trade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Sample Initial Data (XAUUSD Gold Trades)
+        const sampleTrades = [
+            {
+                id: '1',
+                date: '2026-10-20T14:30',
+                session: 'New York',
+                direction: 'BUY',
+                lot: 1.00,
+                entry: 2720.50,
+                exit: 2732.10,
+                sl: 2715.00,
+                tp: 2735.00,
+                pips: 116.0,
+                pnl: 1160.00,
+                setup: 'Liquidity Sweep',
+                psychology: 'Disiplin & Tenang',
+                rulesFollowed: true,
+                notes: 'Sweep SSL di timeframe H1 pas NY Open, reaksi mantul dari FVG.'
+            },
+            {
+                id: '2',
+                date: '2026-10-21T09:15',
+                session: 'London',
+                direction: 'SELL',
+                lot: 0.50,
+                entry: 2735.00,
+                exit: 2742.00,
+                sl: 2740.00,
+                tp: 2720.00,
+                pips: -70.0,
+                pnl: -350.00,
+                setup: 'Breakout & Retest',
+                psychology: 'FOMO / Terburu-buru',
+                rulesFollowed: false,
+                notes: 'Cut SL terkena slippage saat berita minor, masuk terlalu awal tanpa pola candle.'
+            },
+            {
+                id: '3',
+                date: '2026-10-21T15:45',
+                session: 'NY/LDN Overlap',
+                direction: 'BUY',
+                lot: 1.00,
+                entry: 2728.00,
+                exit: 2745.50,
+                sl: 2720.00,
+                tp: 2750.00,
+                pips: 175.0,
+                pnl: 1750.00,
+                setup: 'Order Block / FVG',
+                psychology: 'Disiplin & Tenang',
+                rulesFollowed: true,
+                notes: 'Mitigasi Bullish Order Block di M15 setelah NY overlap.'
+            }
+        ];
+
+        // Global State
+        let trades = [];
+        let equityChartInstance = null;
+        let breakdownChartInstance = null;
+
+        // Initialize App
+        window.onload = function() {
+            const savedData = localStorage.getItem('tittotrader_xauusd_trades');
+            if (savedData) {
+                try {
+                    trades = JSON.parse(savedData);
+                } catch(e) {
+                    trades = [...sampleTrades];
+                }
+            } else {
+                trades = [...sampleTrades];
+                saveToLocalStorage();
+            }
+
+            // Set default datetime input to now
+            document.getElementById('tradeDate').value = new Date().toISOString().slice(0, 16);
+
+            refreshUI();
+        };
+
+        function saveToLocalStorage() {
+            localStorage.setItem('tittotrader_xauusd_trades', JSON.stringify(trades));
+        }
+
+        function refreshUI() {
+            calculateDashboardStats();
+            renderTradesTable();
+            renderEquityChart();
+            updateBreakdownChart();
+        }
+
+        // Dashboard Stats Calculation
+        function calculateDashboardStats() {
+            if (trades.length === 0) {
+                document.getElementById('statNetPnL').innerText = '$0.00';
+                document.getElementById('statNetPips').innerText = '+0.0 Pips';
+                document.getElementById('statWinRate').innerText = '0%';
+                document.getElementById('statWinRatio').innerText = '0W / 0L';
+                document.getElementById('statTotalTrades').innerText = '0';
+                document.getElementById('statProfitFactor').innerText = '0.00';
+                document.getElementById('statAvgWinLoss').innerText = '$0 / $0';
+                document.getElementById('statRRRatio').innerText = 'RR Avg 1:0.0';
+                document.getElementById('statDiscipline').innerText = '100%';
+                return;
+            }
+
+            let totalPnL = 0;
+            let totalPips = 0;
+            let wins = 0;
+            let losses = 0;
+            let grossProfit = 0;
+            let grossLoss = 0;
+            let totalWinAmount = 0;
+            let totalLossAmount = 0;
+            let rulesFollowedCount = 0;
+
+            trades.forEach(t => {
+                totalPnL += t.pnl;
+                totalPips += t.pips;
+
+                if (t.pnl > 0) {
+                    wins++;
+                    grossProfit += t.pnl;
+                    totalWinAmount += t.pnl;
+                } else if (t.pnl < 0) {
+                    losses++;
+                    grossLoss += Math.abs(t.pnl);
+                    totalLossAmount += Math.abs(t.pnl);
+                }
+
+                if (t.rulesFollowed) rulesFollowedCount++;
+            });
+
+            const winRate = Math.round((wins / trades.length) * 100);
+            const profitFactor = grossLoss === 0 ? grossProfit.toFixed(2) : (grossProfit / grossLoss).toFixed(2);
+            const avgWin = wins > 0 ? (totalWinAmount / wins) : 0;
+            const avgLoss = losses > 0 ? (totalLossAmount / losses) : 0;
+            const rrRatio = avgLoss === 0 ? 'N/A' : (avgWin / avgLoss).toFixed(1);
+            const disciplineScore = Math.round((rulesFollowedCount / trades.length) * 100);
+
+            // Update DOM
+            const pnlElem = document.getElementById('statNetPnL');
+            pnlElem.innerText = (totalPnL >= 0 ? '+' : '') + '$' + totalPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            pnlElem.className = `text-xl sm:text-2xl font-black ${totalPnL >= 0 ? 'text-pinklight' : 'text-red-500'}`;
+
+            document.getElementById('statNetPips').innerText = (totalPips >= 0 ? '+' : '') + totalPips.toFixed(1) + ' Pips';
+            document.getElementById('statWinRate').innerText = winRate + '%';
+            document.getElementById('statWinRatio').innerText = `${wins}W / ${losses}L`;
+            document.getElementById('statTotalTrades').innerText = trades.length;
+            document.getElementById('statProfitFactor').innerText = profitFactor;
+            document.getElementById('statAvgWinLoss').innerText = `$${Math.round(avgWin)} / -$${Math.round(avgLoss)}`;
+            document.getElementById('statRRRatio').innerText = `RR Avg 1:${rrRatio}`;
+            document.getElementById('statDiscipline').innerText = disciplineScore + '%';
+        }
+
+        // Live Calculate Form P&L & Risk Reward
+        function calculateLiveMetrics() {
+            const entry = parseFloat(document.getElementById('tradeEntry').value) || 0;
+            const exit = parseFloat(document.getElementById('tradeExit').value) || 0;
+            const sl = parseFloat(document.getElementById('tradeSL').value) || 0;
+            const lot = parseFloat(document.getElementById('tradeLot').value) || 1.0;
+            const direction = document.querySelector('input[name="direction"]:checked').value;
+
+            if (!entry || !exit) {
+                document.getElementById('previewPips').innerText = '0.0 pips';
+                document.getElementById('previewPnL').innerText = '$0.00';
+                document.getElementById('previewRR').innerText = '1 : 0.0';
+                return;
+            }
+
+            let pips = 0;
+            if (direction === 'BUY') {
+                pips = (exit - entry) * 10; // XAUUSD: 1.00 price move = 10 pips ($1.0 = 10 pips)
+            } else {
+                pips = (entry - exit) * 10;
+            }
+
+            // XAUUSD: 1.00 Lot = $10 per pip
+            const pnl = pips * 10 * lot;
+
+            // RR ratio calculation
+            let rrText = '1 : 0.0';
+            if (sl > 0) {
+                const riskPips = Math.abs(entry - sl) * 10;
+                if (riskPips > 0) {
+                    const ratio = (pips / riskPips).toFixed(1);
+                    rrText = `1 : ${ratio}`;
+                }
+            }
+
+            const previewPipsElem = document.getElementById('previewPips');
+            const previewPnLElem = document.getElementById('previewPnL');
+
+            previewPipsElem.innerText = (pips >= 0 ? '+' : '') + pips.toFixed(1) + ' pips';
+            previewPnLElem.innerText = (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
+            previewPnLElem.className = `font-bold ${pnl >= 0 ? 'text-pinklight' : 'text-red-400'}`;
+            document.getElementById('previewRR').innerText = rrText;
+        }
+
+        // Render Table Trades
+        function renderTradesTable() {
+            const tbody = document.getElementById('tradesTableBody');
+            const emptyState = document.getElementById('emptyState');
+            tbody.innerHTML = '';
+
+            const searchKey = document.getElementById('searchInput').value.toLowerCase();
+            const sessionFilter = document.getElementById('filterSession').value;
+            const directionFilter = document.getElementById('filterDirection').value;
+            const outcomeFilter = document.getElementById('filterOutcome').value;
+
+            const filtered = trades.filter(t => {
+                const matchesSearch = (t.setup && t.setup.toLowerCase().includes(searchKey)) ||
+                                      (t.notes && t.notes.toLowerCase().includes(searchKey));
+                const matchesSession = sessionFilter === 'ALL' || t.session === sessionFilter;
+                const matchesDirection = directionFilter === 'ALL' || t.direction === directionFilter;
+                
+                let matchesOutcome = true;
+                if (outcomeFilter === 'WIN') matchesOutcome = t.pnl > 0;
+                if (outcomeFilter === 'LOSS') matchesOutcome = t.pnl < 0;
+
+                return matchesSearch && matchesSession && matchesDirection && matchesOutcome;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Sort trades newest first
+            const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sorted.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-darkcard/80 transition-all border-b border-darkborder/40';
+
+                const formattedDate = new Date(t.date).toLocaleString('id-ID', {
+                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                });
+
+                const isWin = t.pnl >= 0;
+                const pnlClass = isWin ? 'text-pinklight font-bold' : 'text-red-400 font-bold';
+                const pnlPrefix = isWin ? '+' : '';
+
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <div class="font-bold text-white">${formattedDate}</div>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-darkbg border border-darkborder text-gray-400">${t.session}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded text-[11px] font-black ${t.direction === 'BUY' ? 'bg-pinkmain/20 text-pinklight border border-pinkmain/40' : 'bg-gray-800 text-gray-300 border border-gray-600'}">
+                            ${t.direction}
+                        </span>
+                    </td>
+                    <td class="p-3 font-semibold text-white">${t.lot.toFixed(2)}</td>
+                    <td class="p-3">
+                        <div class="text-gray-200 font-mono">${t.entry.toFixed(2)}</div>
+                        <div class="text-gray-400 text-[10px] font-mono">Exit: ${t.exit.toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 font-mono ${pnlClass}">${pnlPrefix}${t.pips.toFixed(1)}</td>
+                    <td class="p-3 font-mono ${pnlClass}">${pnlPrefix}$${t.pnl.toFixed(2)}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-lg bg-darkbg border border-pinkmain/20 text-gray-200 text-[11px]">
+                            ${t.setup}
+                        </span>
+                    </td>
+                    <td class="p-3 text-gray-300 text-[11px]">
+                        ${t.psychology}
+                    </td>
+                    <td class="p-3 text-center">
+                        ${t.rulesFollowed ? 
+                            '<i class="fa-solid fa-circle-check text-pinklight text-base" title="Sesuai Plan"></i>' : 
+                            '<i class="fa-solid fa-circle-xmark text-red-500 text-base" title="Melanggar Plan"></i>'}
+                    </td>
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editTrade('${t.id}')" class="text-gray-400 hover:text-pinklight transition-all p-1">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteTrade('${t.id}')" class="text-gray-400 hover:text-red-400 transition-all p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render Equity Chart (Pink Cyber Style)
+        function renderEquityChart() {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+
+            if (equityChartInstance) {
+                equityChartInstance.destroy();
+            }
+
+            // Sort trades chronologically ascending
+            const chronological = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            let cumulative = 0;
+            const labels = ['Start'];
+            const data = [0];
+
+            chronological.forEach((t, i) => {
+                cumulative += t.pnl;
+                labels.push(`#${i+1}`);
+                data.push(cumulative);
+            });
+
+            // Gradient Fill Pink
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(255, 20, 147, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 20, 147, 0.0)');
+
+            equityChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative P&L ($)',
+                        data: data,
+                        borderColor: '#FF1493',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#FF69B4',
+                        pointBorderColor: '#0A0A0C',
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Cum. P&L: $${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(38, 38, 48, 0.5)' },
+                            ticks: { color: '#94A3B8' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(38, 38, 48, 0.5)' },
+                            ticks: {
+                                color: '#94A3B8',
+                                callback: function(value) { return '$' + value; }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Breakdown Doughnut / Bar Chart
+        function updateBreakdownChart() {
+            const ctx = document.getElementById('breakdownChart').getContext('2d');
+            const type = document.getElementById('chartBreakdownSelect').value;
+
+            if (breakdownChartInstance) {
+                breakdownChartInstance.destroy();
+            }
+
+            const categoryMap = {};
+
+            trades.forEach(t => {
+                let key = t.session;
+                if (type === 'setup') key = t.setup;
+                if (type === 'psychology') key = t.psychology;
+
+                if (!categoryMap[key]) categoryMap[key] = 0;
+                categoryMap[key] += t.pnl;
+            });
+
+            const labels = Object.keys(categoryMap);
+            const data = Object.values(categoryMap);
+
+            const pinkPalette = [
+                '#FF1493', '#FF69B4', '#E0115F', '#FF8DA1', '#B3005E', '#D10069'
+            ];
+
+            breakdownChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length > 0 ? labels : ['No Data'],
+                    datasets: [{
+                        data: data.length > 0 ? data : [1],
+                        backgroundColor: pinkPalette,
+                        borderColor: '#121216',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#CBD5E1', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Modal Open / Close
+        function openModal(editId = null) {
+            const modal = document.getElementById('tradeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('tradeForm');
+
+            if (editId) {
+                const t = trades.find(item => item.id === editId);
+                if (!t) return;
+                modalTitle.innerText = 'Edit Trade XAUUSD';
+                document.getElementById('tradeId').value = t.id;
+                document.getElementById('tradeDate').value = t.date;
+                document.getElementById('tradeSession').value = t.session;
+                document.querySelector(`input[name="direction"][value="${t.direction}"]`).checked = true;
+                document.getElementById('tradeLot').value = t.lot;
+                document.getElementById('tradeEntry').value = t.entry;
+                document.getElementById('tradeExit').value = t.exit;
+                document.getElementById('tradeSL').value = t.sl || '';
+                document.getElementById('tradeTP').value = t.tp || '';
+                document.getElementById('tradeSetup').value = t.setup;
+                document.getElementById('tradePsychology').value = t.psychology;
+                document.getElementById('tradeRules').checked = t.rulesFollowed;
+                document.getElementById('tradeNotes').value = t.notes || '';
+            } else {
+                modalTitle.innerText = 'Input Trade XAUUSD Baru';
+                form.reset();
+                document.getElementById('tradeId').value = '';
+                document.getElementById('tradeDate').value = new Date().toISOString().slice(0, 16);
+            }
+
+            calculateLiveMetrics();
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('tradeModal');
+            modal.classList.remove('opacity-100', 'pointer-events-auto');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        // Save / Edit Trade
+        function saveTrade(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('tradeId').value;
+            const date = document.getElementById('tradeDate').value;
+            const session = document.getElementById('tradeSession').value;
+            const direction = document.querySelector('input[name="direction"]:checked').value;
+            const lot = parseFloat(document.getElementById('tradeLot').value);
+            const entry = parseFloat(document.getElementById('tradeEntry').value);
+            const exit = parseFloat(document.getElementById('tradeExit').value);
+            const sl = parseFloat(document.getElementById('tradeSL').value) || 0;
+            const tp = parseFloat(document.getElementById('tradeTP').value) || 0;
+            const setup = document.getElementById('tradeSetup').value;
+            const psychology = document.getElementById('tradePsychology').value;
+            const rulesFollowed = document.getElementById('tradeRules').checked;
+            const notes = document.getElementById('tradeNotes').value;
+
+            // XAUUSD calculation: 1.0 price move = 10 pips
+            let pips = 0;
+            if (direction === 'BUY') {
+                pips = (exit - entry) * 10;
+            } else {
+                pips = (entry - exit) * 10;
+            }
+
+            // P&L: 1 Lot = $10 / pip
+            const pnl = pips * 10 * lot;
+
+            const tradeObj = {
+                id: editId ? editId : Date.now().toString(),
+                date, session, direction, lot, entry, exit, sl, tp, pips, pnl,
+                setup, psychology, rulesFollowed, notes
+            };
+
+            if (editId) {
+                const idx = trades.findIndex(t => t.id === editId);
+                if (idx !== -1) trades[idx] = tradeObj;
+            } else {
+                trades.push(tradeObj);
+            }
+
+            saveToLocalStorage();
+            refreshUI();
+            closeModal();
+        }
+
+        function editTrade(id) {
+            openModal(id);
+        }
+
+        function deleteTrade(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus catatan trade ini?')) {
+                trades = trades.filter(t => t.id !== id);
+                saveToLocalStorage();
+                refreshUI();
+            }
+        }
+
+        // Export / Import Functions
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `tittotrader_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function exportCSV() {
+            if (trades.length === 0) return;
+            let csvContent = "data:text/csv;charset=utf-8,ID,Date,Session,Direction,Lot,Entry,Exit,Pips,PnL,Setup,Psychology,RulesFollowed,Notes\n";
+
+            trades.forEach(t => {
+                csvContent += `"${t.id}","${t.date}","${t.session}","${t.direction}",${t.lot},${t.entry},${t.exit},${t.pips},${t.pnl},"${t.setup}","${t.psychology}",${t.rulesFollowed},"${(t.notes || '').replace(/"/g, '""')}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `tittotrader_xauusd_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        trades = imported;
+                        saveToLocalStorage();
+                        refreshUI();
+                        alert('Data jurnal trading berhasil diimpor!');
+                    } else {
+                        alert('Format file JSON tidak valid.');
+                    }
+                } catch(err) {
+                    alert('Gagal membaca file JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetData() {
+            if (confirm('PERINGATAN: Semua data jurnal akan dihapus permanen. Lanjutkan?')) {
+                trades = [];
+                saveToLocalStorage();
+                refreshUI();
+            }
+        }
+    </script>
+</body>
+</html>
